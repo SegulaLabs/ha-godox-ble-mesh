@@ -152,7 +152,22 @@ large safety margin and saves the result. Nobody configuring this integration
 should ever need to run a separate script to find this number by hand — that
 manual process is exactly what this feature replaces.
 
-## 5. Why a shared connection works at all
+## 5. Automatic setup: parsing the export instead of hand-typing it
+
+The config flow's "Import from the Godox app" path (`meshimport.py`) just
+parses the same JSON document described in §1 directly — no manual field
+re-typing, no hex-to-decimal conversion for addresses. The only judgment call
+it makes is **which entries in `nodes[]` are actual Godox lights**: the app's
+own provisioner entry (itself a node in that same list, named something like
+"Telink iOS provisioner node") has no `cid` field at all, while every real
+light we've seen carries `"cid": "0211"` — Godox's Bluetooth SIG company id.
+Filtering on that field, not the node's name (which is just whatever text the
+installer typed in-app), is what separates "a Godox light" from the
+provisioner's own bookkeeping entry or another vendor's node that happens to
+share the mesh. See the README's "Scope: Godox TL60 first" section for what
+this does and doesn't tell you about *which* Godox light model each node is.
+
+## 6. Why a shared connection works at all
 
 Bluetooth Mesh is, as the name says, a mesh: a client opens one ordinary GATT
 connection to *any* node that supports the Proxy feature, and that node
@@ -175,7 +190,7 @@ until that other connection is closed. This integration automatically picks
 a different light as gateway if its current one drops or fails, the same way
 `godox_mesh.py`'s `discover`/`on`/`off` commands do.
 
-## 6. What didn't work, and why (for anyone re-deriving this later)
+## 7. What didn't work, and why (for anyone re-deriving this later)
 
 | Tried | Result | Why |
 |---|---|---|

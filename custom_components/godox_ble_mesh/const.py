@@ -8,8 +8,11 @@ CONF_PROVISIONER_ADDRESS = "provisioner_address"
 CONF_NODE_ADDRESS = "node_address"
 CONF_NODES = "nodes"  # list of {"name": str, "address": int}
 
-DEFAULT_PROVISIONER_ADDRESS = 0x0500  # pick one not used by the Godox app (0x0100)
-                                       # or any other controller on this network
+DEFAULT_PROVISIONER_ADDRESS = 0x0400  # pick one not used by the Godox app (0x0100)
+                                       # or any other controller on this network --
+                                       # 0x0400 is this project's own convention for
+                                       # "the Home Assistant instance" (0x0300 is the
+                                       # sibling godox_mesh.py script's address)
 
 # These lights silently drop messages whose sequence number is at or below one
 # they've already seen (standard Bluetooth Mesh replay protection) -- there is

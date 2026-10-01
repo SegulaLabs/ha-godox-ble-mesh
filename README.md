@@ -24,6 +24,7 @@ script this integration's protocol code is ported from.
 | | ha-godox-mesh | This integration |
 |---|---|---|
 | Adding a light already paired to the Godox app | Not supported (only factory-reset lights) | **The only supported path** — paste its mesh address, nothing else |
+| Setup | Manual keys + manual per-light provisioning | **Paste the Godox app's own export once** — keys, light names and addresses are all picked up automatically (a manual-entry path still exists if you don't have the export handy) |
 | Device key needed per light | Yes | **No** — every command this integration sends is AppKey-encrypted, never device-key-encrypted (see below) |
 | Multiple lights, one Bluetooth connection | Only for lights HA itself provisioned | **Always** — one config entry = one connection, shared by every light under it |
 | Sequence-number floor | You find it by hand (or guess) | **Found automatically** during setup, and again any time from Settings → the integration → Configure → "Re-find the sequence number" |
@@ -73,23 +74,47 @@ Copy `custom_components/godox_ble_mesh/` into your Home Assistant's
 
 **Settings → Devices & services → Add integration → ha Godox BLE Mesh**
 
-1. Paste the network key and app key.
-2. Pick a **provisioner address** this network hasn't seen before — a number
-   between 1 and 32767, in decimal. Anything not already used by the Godox
-   app (`256` = `0x0100`) or another controller on the same mesh is fine;
-   `1280` (`0x0500`) is a reasonable default if you have nothing else running.
-3. Submit. The integration connects to whichever light it can reach and
+### The easy way: import
+
+1. Choose **"Import from the Godox app (recommended)"**.
+2. Paste the whole mesh export (the `meshJson` blob — see
+   [docs/HOW-THIS-WORKS.md](docs/HOW-THIS-WORKS.md) for how to get it out of
+   the Godox app's own database; this is still a one-time step, there's no
+   way around getting the keys out of the app itself).
+3. Pick which of the Godox lights found in the export to add now — everything
+   is pre-selected, so most people just hit submit. No hex, no decimal
+   conversion, no typing addresses.
+4. Submit. The integration connects to whichever light it can reach and
    **automatically finds a working sequence number** — you do not need to run
    any script or guess a number by hand. If nothing answers, close the Godox
    app (and any other tool connected to the lights) and try again.
 
-### Adding lights
+Only entries whose Bluetooth SIG company id is Godox's own (`0211`) are
+picked up from the export — this is what tells a real Godox light apart from
+the app's own provisioner entry in the same file, and would also skip any
+other vendor's device sharing the same mesh.
 
-Once the mesh entry exists: **that entry → Configure → Add a light**. Give it
-a name and its mesh address in decimal (`0x0115` is `277` — a hex-to-decimal
-converter or Python's `int("0115", 16)` gets you there). No device key, no
-pairing mode, no effect on the Godox app. Repeat for each light — they all
-share the one connection this entry already holds.
+### The manual way
+
+If you don't have the export handy, choose **"Enter network key and app key
+manually"** instead, paste just the two keys, pick a provisioner address (see
+below), and add lights afterwards one at a time via **Configure → Add a
+light** (name + mesh address in decimal — `0x0115` is `277`).
+
+A **provisioner address** is a number between 1 and 32767 this network hasn't
+seen before — anything not already used by the Godox app (`256` = `0x0100`)
+or another controller on the same mesh is fine; `1024` (`0x0400`) is this
+project's own convention for "the Home Assistant instance" if you have
+nothing else running.
+
+### Adding more lights later
+
+**That entry → Configure → "Add lights from the Godox app export"** — paste
+the export again and pick from whatever wasn't already added, same as initial
+setup. Or **Configure → "Add a light manually"** for a single light by name
+and decimal address. Either way: no device key, no pairing mode, no effect on
+the Godox app — every light added shares the one connection this entry
+already holds.
 
 ### If lights stop responding later
 
@@ -103,16 +128,25 @@ everything that used to work suddenly goes silent with no error:
 **That entry → Configure → "Re-find the sequence number"** — reconnects and
 probes for the current floor automatically, the same way initial setup did.
 
-## Current status
+## Scope: Godox TL60 first
 
-Built and verified against two lights on one Godox TL60 mesh — **Corner sofa**
-and **Shelf** — controlling on/off, brightness and colour temperature. Not
-yet exercised against other Godox mesh models; the vendor protocol is
-expected to be identical (see `docs/HOW-THIS-WORKS.md`), but the
-colour-temperature range (`2700`–`6500` K) is currently hard-coded to the
-TL60's own range and not yet read from a per-model table the way ha-godox-mesh
-does — a model-aware range table is a natural next step if other light models
-get added.
+This project was built and is verified against a mesh of **Godox TL60**
+units, controlling on/off, brightness and colour temperature. The import
+feature accepts any node whose Bluetooth SIG company id is `0211` (Godox's
+own), since that's the only reliable "is this a Godox light" signal available
+without a device key — it does not currently distinguish *which* Godox
+model a given node is.
+
+In practice this means: other Godox mesh lights sharing the same vendor
+opcode (`0x0211F0`) and command format will likely respond to on/off and
+brightness/CCT commands too, since the protocol itself is vendor-wide, not
+TL60-specific (see `docs/HOW-THIS-WORKS.md`). What is **not** yet handled is
+anything that varies *by model* — the colour-temperature range
+(`2700`–`6500` K) is currently hard-coded to the TL60's own range rather than
+read from a per-model table the way ha-godox-mesh does, so a different Godox
+light with a wider or narrower range, or extra controls (tint, effects), may
+report its capabilities wrong even if basic control works. A model-aware
+capabilities table is a natural next step if non-TL60 hardware gets tested.
 
 ## Project layout
 
@@ -121,7 +155,8 @@ custom_components/godox_ble_mesh/
   __init__.py       entry setup/teardown, wires the hub to the light platform
   hub.py            the shared connection: gateway selection, send/receive,
                     sequence-number probing -- ported from godox_mesh.py
-  config_flow.py    setup wizard + the Configure menu (add/remove light, re-probe)
+  config_flow.py    setup wizard (import or manual) + the Configure menu (add/remove light, re-probe)
+  meshimport.py     parses the Godox app's mesh export for the import path
   light.py          one LightEntity per configured mesh address
   meshcrypto.py     Bluetooth Mesh crypto, identical to the standalone script's
   const.py          domain, option keys, defaults

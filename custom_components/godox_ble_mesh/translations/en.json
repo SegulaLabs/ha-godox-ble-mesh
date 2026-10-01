@@ -2,18 +2,43 @@
   "config": {
     "step": {
       "user": {
+        "title": "Set up ha Godox BLE Mesh",
+        "menu_options": {
+          "import": "Import from the Godox app (recommended)",
+          "manual": "Enter network key and app key manually"
+        }
+      },
+      "import": {
+        "title": "Import the Godox app's mesh export",
+        "description": "Paste the whole `meshJson` export from the Godox app's own database here (see the project README's \"How the keys were found\" section) -- the network key, app key, and every Godox light's name and address are picked up automatically, no hex or decimal typing needed.",
+        "data": {
+          "mesh_export": "Mesh export JSON"
+        }
+      },
+      "select_lights": {
+        "title": "Choose which lights to add",
+        "description": "These are the Godox lights found in the export. You can add more later from Configure.",
+        "data": {
+          "addresses": "Lights"
+        }
+      },
+      "manual": {
         "title": "Godox mesh network keys",
         "description": "Paste the network key and app key pulled from the Godox app's own database (see the project README's \"How the keys were found\" section). Pick a provisioner address this installation hasn't used before -- different from the Godox app's own address (0x0100 / 256) and from any other controller (another Home Assistant instance, the project's own `godox_mesh.py` script, etc.) on the same mesh.",
         "data": {
           "network_key": "Network key (32 hex characters)",
           "app_key": "App key (32 hex characters)",
-          "provisioner_address": "This installation's address (decimal, e.g. 1280 for 0x0500)"
+          "provisioner_address": "This installation's address (decimal, e.g. 1024 for 0x0400)"
         }
       }
     },
     "error": {
       "no_light_found": "No light on this mesh answered. Close the Godox app and any other tool connected to it, make sure a light is powered on and in range, then try again.",
-      "invalid_key": "Not a valid 32-character hexadecimal key."
+      "invalid_key": "Not a valid 32-character hexadecimal key.",
+      "import_not_json": "That isn't valid JSON -- paste the whole mesh export, unedited.",
+      "import_missing_keys": "That JSON doesn't have the expected netKeys/appKeys fields -- make sure it's the full mesh export, not a partial copy.",
+      "import_no_lights": "No Godox lights (company id 0211) were found in that export.",
+      "import_invalid": "Couldn't read that as a Godox mesh export."
     },
     "abort": {
       "already_configured": "This mesh network is already configured."
@@ -24,9 +49,23 @@
       "init": {
         "title": "Godox mesh",
         "menu_options": {
-          "add_light": "Add a light",
+          "import_lights": "Add lights from the Godox app export",
+          "add_light": "Add a light manually",
           "remove_light": "Remove a light",
           "reprobe": "Re-find the sequence number (lights stopped responding)"
+        }
+      },
+      "import_lights": {
+        "title": "Import more lights",
+        "description": "Paste the Godox app's mesh export again -- lights already added to this entry are skipped automatically.",
+        "data": {
+          "mesh_export": "Mesh export JSON"
+        }
+      },
+      "import_select": {
+        "title": "Choose which lights to add",
+        "data": {
+          "addresses": "Lights"
         }
       },
       "add_light": {
@@ -45,11 +84,16 @@
       }
     },
     "error": {
-      "address_already_added": "A light with this address is already configured."
+      "address_already_added": "A light with this address is already configured.",
+      "import_not_json": "That isn't valid JSON -- paste the whole mesh export, unedited.",
+      "import_missing_keys": "That JSON doesn't have the expected netKeys/appKeys fields -- make sure it's the full mesh export, not a partial copy.",
+      "import_no_lights": "No Godox lights (company id 0211) were found in that export.",
+      "import_invalid": "Couldn't read that as a Godox mesh export."
     },
     "abort": {
       "no_lights_configured": "No lights are configured on this mesh yet.",
-      "no_light_found": "No light on this mesh answered. Close the Godox app and any other tool connected to it, then try again."
+      "no_light_found": "No light on this mesh answered. Close the Godox app and any other tool connected to it, then try again.",
+      "all_lights_already_added": "Every Godox light in that export is already added to this mesh."
     }
   }
 }
