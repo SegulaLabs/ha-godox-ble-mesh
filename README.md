@@ -19,6 +19,14 @@ script this integration's protocol code is ported from.
 > Treat your Home Assistant config (and any exported `.storage` backups) with
 > the same care as a password.
 
+## Trademarks and affiliation
+
+"Godox" and the Godox logo (used as this integration's icon — see
+[`custom_components/godox_ble_mesh/brand/`](custom_components/godox_ble_mesh/brand/README.md)
+for where it came from) are trademarks of Godox Photo Equipment Co., Ltd.
+This is an independent, unofficial project, **not affiliated with, endorsed
+by, or sponsored by** Godox.
+
 ## What makes this different from ha-godox-mesh
 
 | | ha-godox-mesh | This integration |
