@@ -12,7 +12,8 @@
       }
     },
     "error": {
-      "no_light_found": "No light on this mesh answered. Close the Godox app and any other tool connected to it, make sure a light is powered on and in range, then try again."
+      "no_light_found": "No light on this mesh answered. Close the Godox app and any other tool connected to it, make sure a light is powered on and in range, then try again.",
+      "invalid_key": "Not a valid 32-character hexadecimal key."
     },
     "abort": {
       "already_configured": "This mesh network is already configured."

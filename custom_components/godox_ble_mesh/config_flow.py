@@ -11,6 +11,7 @@ every light through whichever one it happened to connect to.
 from __future__ import annotations
 
 import logging
+import re
 from typing import Any
 
 import voluptuous as vol
@@ -34,15 +35,23 @@ from .meshcrypto import NetKey
 
 _LOGGER = logging.getLogger(__name__)
 
-HEX32 = vol.All(str, vol.Match(r"^[0-9a-fA-F]{32}$"))
+_HEX32_RE = re.compile(r"^[0-9a-fA-F]{32}$")
+
+
+def _is_hex32(value: str) -> bool:
+    return bool(_HEX32_RE.match(value))
 
 
 def _mesh_keys_schema(defaults: dict[str, Any] | None = None) -> vol.Schema:
+    # Plain `str` here, not a vol.Match validator: Home Assistant's frontend
+    # serializer (voluptuous_serialize) cannot turn a raw regex validator into
+    # a form field and raises a 500 trying -- the hex-format check is done by
+    # hand in async_step_user instead, after submission.
     defaults = defaults or {}
     return vol.Schema(
         {
-            vol.Required(CONF_NETWORK_KEY, default=defaults.get(CONF_NETWORK_KEY, "")): HEX32,
-            vol.Required(CONF_APP_KEY, default=defaults.get(CONF_APP_KEY, "")): HEX32,
+            vol.Required(CONF_NETWORK_KEY, default=defaults.get(CONF_NETWORK_KEY, "")): str,
+            vol.Required(CONF_APP_KEY, default=defaults.get(CONF_APP_KEY, "")): str,
             vol.Required(
                 CONF_PROVISIONER_ADDRESS,
                 default=defaults.get(CONF_PROVISIONER_ADDRESS, DEFAULT_PROVISIONER_ADDRESS),
@@ -63,14 +72,22 @@ class GodoxBleMeshConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> Any:
         errors: dict[str, str] = {}
         if user_input is not None:
-            network_id = NetKey(user_input[CONF_NETWORK_KEY]).network_id.hex()
-            await self.async_set_unique_id(network_id)
-            self._abort_if_unique_id_configured()
-            self._mesh_input = user_input
-            return await self.async_step_probe()
+            network_key = user_input[CONF_NETWORK_KEY].strip().lower()
+            app_key = user_input[CONF_APP_KEY].strip().lower()
+            if not _is_hex32(network_key):
+                errors[CONF_NETWORK_KEY] = "invalid_key"
+            if not _is_hex32(app_key):
+                errors[CONF_APP_KEY] = "invalid_key"
+            if not errors:
+                user_input = {**user_input, CONF_NETWORK_KEY: network_key, CONF_APP_KEY: app_key}
+                network_id = NetKey(network_key).network_id.hex()
+                await self.async_set_unique_id(network_id)
+                self._abort_if_unique_id_configured()
+                self._mesh_input = user_input
+                return await self.async_step_probe()
 
         return self.async_show_form(
-            step_id="user", data_schema=_mesh_keys_schema(), errors=errors,
+            step_id="user", data_schema=_mesh_keys_schema(user_input), errors=errors,
         )
 
     async def async_step_probe(self, _user_input: dict[str, Any] | None = None) -> Any:
