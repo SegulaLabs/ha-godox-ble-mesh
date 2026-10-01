@@ -1,4 +1,4 @@
-"""Light entities for Godox BLE Mesh (Direct).
+"""Light entities for ha Godox BLE Mesh.
 
 Every entity here shares its config entry's one `GodoxMeshHub` connection --
 turning on a light added fifth costs no extra Bluetooth connection, the same

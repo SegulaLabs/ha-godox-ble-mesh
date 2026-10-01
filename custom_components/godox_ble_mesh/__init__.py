@@ -1,4 +1,4 @@
-"""Godox BLE Mesh (Direct) -- control Godox Bluetooth Mesh lights without
+"""ha Godox BLE Mesh -- control Godox Bluetooth Mesh lights without
 re-provisioning them away from the Godox phone app.
 
 One config entry is one mesh network and holds exactly one shared Bluetooth

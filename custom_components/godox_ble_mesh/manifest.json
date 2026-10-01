@@ -1,10 +1,10 @@
 {
   "domain": "godox_ble_mesh",
-  "name": "Godox BLE Mesh (Direct)",
+  "name": "ha Godox BLE Mesh",
   "codeowners": [],
   "config_flow": true,
   "dependencies": ["bluetooth_adapters"],
-  "documentation": "https://github.com/REPLACE_ME/godox-ble-mesh-ha",
+  "documentation": "https://github.com/SegulaLabs/ha-godox-ble-mesh",
   "integration_type": "hub",
   "iot_class": "local_push",
   "requirements": ["bleak>=0.22", "bleak-retry-connector>=3.4", "cryptography>=42"],

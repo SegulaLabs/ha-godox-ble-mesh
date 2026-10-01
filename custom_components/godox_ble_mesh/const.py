@@ -1,4 +1,4 @@
-"""Constants for the Godox BLE Mesh (Direct) integration."""
+"""Constants for the ha Godox BLE Mesh integration."""
 
 DOMAIN = "godox_ble_mesh"
 

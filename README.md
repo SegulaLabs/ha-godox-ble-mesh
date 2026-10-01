@@ -1,4 +1,4 @@
-# Godox BLE Mesh (Direct)
+# ha Godox BLE Mesh
 
 A Home Assistant custom integration that controls Godox Bluetooth Mesh lights
 (TL60 and likely every other light on the same LK8620/Telink mesh radio)
@@ -51,7 +51,7 @@ key, the app key, and each light's mesh address.
 
 1. HACS → Integrations → ⋮ → Custom repositories → add this repo's URL,
    category **Integration**.
-2. Install **Godox BLE Mesh (Direct)**, restart Home Assistant.
+2. Install **ha Godox BLE Mesh**, restart Home Assistant.
 
 ### Manually
 
@@ -71,7 +71,7 @@ Copy `custom_components/godox_ble_mesh/` into your Home Assistant's
 
 ## Setup
 
-**Settings → Devices & services → Add integration → Godox BLE Mesh (Direct)**
+**Settings → Devices & services → Add integration → ha Godox BLE Mesh**
 
 1. Paste the network key and app key.
 2. Pick a **provisioner address** this network hasn't seen before — a number

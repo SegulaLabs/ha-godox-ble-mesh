@@ -1,4 +1,4 @@
-"""Config flow for Godox BLE Mesh (Direct).
+"""Config flow for ha Godox BLE Mesh.
 
 One config entry = one Godox mesh network (the keys you already pulled out of
 the Godox app's own database -- see this project's README for how). Lights are
