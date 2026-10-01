@@ -64,6 +64,38 @@ needs it, addresses already assigned). So the device key — which the
 community `ha-godox-mesh` integration requires for its provisioning flow — is
 simply never touched.
 
+### The direct consequence: this integration never provisions a light
+
+Binding an app key to a light and assigning it a mesh address *is itself* a
+Configuration message exchange, gated by that light's device key (obtained
+during Bluetooth Mesh provisioning — the "unprovisioned device" handshake a
+factory-reset light goes through). Since this project deliberately never
+touches device keys or Configuration messages, **it has no way to bring a
+brand-new, factory-reset light onto the mesh.** That's not a missing feature
+to add later — it's the direct, structural result of the no-device-key
+design that makes everything else (one shared connection, no re-pairing risk,
+no touching the Godox app's own pairing) possible.
+
+`ha-godox-mesh` makes the opposite trade-off: it *does* do real provisioning
+(its "add to this mesh" feature), which is why it needs a device key per
+light and why — per the project's own README — it can only provision
+factory-reset lights, not ones the Godox app already paired.
+
+Practically, this means a light's lifecycle always starts in the Godox app,
+never in Home Assistant:
+
+1. **Pair the new light in the Godox app**, same as always — this is what
+   actually provisions it: assigns its mesh address, generates its device
+   key, and binds the mesh's network/app keys to it.
+2. **Re-export the mesh JSON** (§1 above) now that the light exists in it.
+3. **Add it here** via the options flow's "Add lights from the Godox app
+   export" (only lights not already configured are offered) or "Add a light
+   manually" if you already know its address.
+
+The network key and app key never change when a light is added — only the
+export's `nodes` list gains one entry. See the README's "Adding a brand-new
+light" section for the user-facing version of this.
+
 ## 3. Standard Bluetooth Mesh commands don't control the light
 
 Sending a standard Generic OnOff Set, or Light Lightness/CTL Set, **is

@@ -141,14 +141,36 @@ or another controller on the same mesh is fine; `1024` (`0x0400`) is this
 project's own convention for "the Home Assistant instance" if you have
 nothing else running.
 
-### Adding more lights later
+### Adding a brand-new light (buying another one later)
 
-**That entry → Configure → "Add lights from the Godox app export"** — paste
-the export again and pick from whatever wasn't already added, same as initial
-setup. Or **Configure → "Add a light manually"** for a single light by name
-and decimal address. Either way: no device key, no pairing mode, no effect on
-the Godox app — every light added shares the one connection this entry
-already holds.
+> [!IMPORTANT]
+> **This is the one thing that works differently from ha-godox-mesh**, and
+> it's worth understanding before you buy your next light.
+>
+> ha-godox-mesh can *provision* a factory-reset light itself, straight from
+> Home Assistant — that's its whole "add to this mesh" feature. **This
+> integration never provisions anything.** It only ever talks to lights the
+> Godox app has already paired and assigned an address to. So a new light's
+> setup is always a two-step round trip:
+>
+> 1. **Pair the new light in the Godox app first**, exactly as you always
+>    would, on your phone. This is what assigns it a mesh address and binds
+>    the network/app keys to it — nothing else can do that step.
+> 2. **Re-export the mesh JSON** (Finder → the phone → Files tab → the Godox
+>    app's folder, same one-time manual step described above) and bring it
+>    into Home Assistant.
+>
+> The network key and app key themselves **do not change** when you add a
+> light — only the export's `nodes` list grows by one. You're not redoing
+> setup, just picking up the one new entry.
+
+With a fresh export in hand: **that entry → Configure → "Add lights from the
+Godox app export"** — paste it in, and only lights not already configured
+here are offered (so pasting the same export again, with one new light added
+in the Godox app, shows just that one). Or **Configure → "Add a light
+manually"** for a single light by name and decimal address, if you already
+know it. Either way: no device key, no pairing mode, no effect on the Godox
+app — every light added shares the one connection this entry already holds.
 
 ### If lights stop responding later
 
