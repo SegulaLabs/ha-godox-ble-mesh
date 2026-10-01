@@ -14,12 +14,11 @@ not a proprietary lock-in. The phone app stores the entire mesh
 configuration — network key, app key, every light's device key and address —
 **in plain text** inside its own local SQLite database.
 
-1. Make a full backup of the iPhone (Finder → select the phone → "Back up all
-   data to this Mac", unencrypted is fine since only app data is needed, not
-   Keychain).
-2. Extract the Godox app's data folder from that backup with a free backup
-   browser (iBackup Viewer, or iMazing's free browsing mode). Look for
-   `GodoxLight.db`.
+1. Connect the iPhone to a Mac and open Finder → select the phone → the
+   **Files** tab. The Godox app shows up there (it declares its Documents
+   folder shareable) — drag its folder straight to the Mac. No full device
+   backup needed; this is a live copy of the app's own data folder.
+2. Inside that folder is `GodoxLight.db`.
 3. Open it (any SQLite tool, or Python's `sqlite3` module) and read the
    `Project` table's `meshJson` column for your active project (the one your
    lights are actually in — check `deviceNum` and the node names). It's a
