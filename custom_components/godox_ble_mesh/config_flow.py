@@ -129,14 +129,20 @@ class GodoxBleMeshConfigFlow(ConfigFlow, domain=DOMAIN):
     @staticmethod
     @callback
     def async_get_options_flow(config_entry: ConfigEntry) -> GodoxBleMeshOptionsFlow:
-        return GodoxBleMeshOptionsFlow(config_entry)
+        # No config_entry argument: GodoxBleMeshOptionsFlow takes none of its
+        # own anymore -- the base OptionsFlow class populates its read-only
+        # `config_entry` property itself once this flow is registered.
+        return GodoxBleMeshOptionsFlow()
 
 
 class GodoxBleMeshOptionsFlow(OptionsFlow):
-    """Add or remove lights on this mesh -- by address only, no device key."""
+    """Add or remove lights on this mesh -- by address only, no device key.
 
-    def __init__(self, config_entry: ConfigEntry) -> None:
-        self.config_entry = config_entry
+    No __init__/config_entry assignment here: newer Home Assistant versions
+    already expose `config_entry` as a read-only property on OptionsFlow,
+    populated by the framework itself -- assigning it ourselves raises
+    `AttributeError: property 'config_entry' has no setter`.
+    """
 
     async def async_step_init(self, _user_input: dict[str, Any] | None = None) -> Any:
         return self.async_show_menu(step_id="init", menu_options=["add_light", "remove_light", "reprobe"])

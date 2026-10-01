@@ -105,6 +105,7 @@ class HubSettings:
     network_key: str
     app_key: str
     provisioner_address: int
+    initial_sequence_number: int = 0x100
 
 
 class GodoxMeshError(Exception):
@@ -122,7 +123,7 @@ class GodoxMeshHub:
         self.src = settings.provisioner_address
 
         self._store: Store = Store(hass, STORAGE_VERSION, f"godox_ble_mesh_{entry_id}")
-        self._seq = 0x100
+        self._seq = settings.initial_sequence_number
         self._seq_lock = asyncio.Lock()
 
         self._client: BleakClient | None = None
@@ -142,7 +143,11 @@ class GodoxMeshHub:
     async def async_load(self) -> None:
         data = await self._store.async_load()
         if data:
-            self._seq = data.get("sequence_number", self._seq)
+            # Never go backwards: this hub's own store (written every 32
+            # messages during actual use) can be ahead of the config entry's
+            # options snapshot (only updated by the initial probe/re-probe),
+            # and the sequence floor only ever rises -- see docs/HOW-THIS-WORKS.md.
+            self._seq = max(self._seq, data.get("sequence_number", self._seq))
             self.iv = data.get("iv_index", self.iv)
         _LOGGER.debug("godox_ble_mesh[%s]: loaded sequence_number=%s", self.entry_id, self._seq)
 

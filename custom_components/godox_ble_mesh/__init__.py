@@ -29,6 +29,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             network_key=entry.data[CONF_NETWORK_KEY],
             app_key=entry.data[CONF_APP_KEY],
             provisioner_address=entry.data[CONF_PROVISIONER_ADDRESS],
+            # The number found by the setup/re-probe flow, carried here via
+            # options since the hub's own on-disk counter starts fresh for a
+            # brand-new entry_id -- see hub.py's async_load().
+            initial_sequence_number=entry.options.get("sequence_number", 0x100),
         ),
     )
     await hub.async_load()
