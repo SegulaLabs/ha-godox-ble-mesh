@@ -1,0 +1,7 @@
+{
+  "name": "Godox BLE Mesh (Direct)",
+  "render_readme": true,
+  "zip_release": false,
+  "filename": "godox_ble_mesh.zip",
+  "homeassistant": "2024.1.0"
+}

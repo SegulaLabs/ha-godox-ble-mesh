@@ -1,0 +1,54 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Godox mesh network keys",
+        "description": "Paste the network key and app key pulled from the Godox app's own database (see the project README's \"How the keys were found\" section). Pick a provisioner address this installation hasn't used before -- different from the Godox app's own address (0x0100 / 256) and from any other controller (another Home Assistant instance, the project's own `godox_mesh.py` script, etc.) on the same mesh.",
+        "data": {
+          "network_key": "Network key (32 hex characters)",
+          "app_key": "App key (32 hex characters)",
+          "provisioner_address": "This installation's address (decimal, e.g. 1280 for 0x0500)"
+        }
+      }
+    },
+    "error": {
+      "no_light_found": "No light on this mesh answered. Close the Godox app and any other tool connected to it, make sure a light is powered on and in range, then try again."
+    },
+    "abort": {
+      "already_configured": "This mesh network is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Godox mesh",
+        "menu_options": {
+          "add_light": "Add a light",
+          "remove_light": "Remove a light",
+          "reprobe": "Re-find the sequence number (lights stopped responding)"
+        }
+      },
+      "add_light": {
+        "title": "Add a light",
+        "description": "{hint}",
+        "data": {
+          "name": "Name",
+          "node_address": "Mesh address (decimal)"
+        }
+      },
+      "remove_light": {
+        "title": "Remove a light",
+        "data": {
+          "node_address": "Light to remove"
+        }
+      }
+    },
+    "error": {
+      "address_already_added": "A light with this address is already configured."
+    },
+    "abort": {
+      "no_lights_configured": "No lights are configured on this mesh yet.",
+      "no_light_found": "No light on this mesh answered. Close the Godox app and any other tool connected to it, then try again."
+    }
+  }
+}
